@@ -1,0 +1,28 @@
+name: Notify parent on YAML change
+
+on:
+  push:
+    branches: [ main ]             # 看你子模块默认分支名
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send repository_dispatch to parent
+        env:
+          PARENT_REPO: jqiwen/acmeair               # ← 改成你的父仓库 full name
+          EVENT_TYPE: submodule-yaml-changed
+          # 需要一个有 repo 权限的 PAT，放在子模块的 Secrets
+          PAT: ${{ secrets.PARENT_REPO_TOKEN }}
+        run: |
+          curl -s -X POST "https://api.github.com/repos/$PARENT_REPO/dispatches" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token $PAT" \
+            -d "{\"event_type\":\"$EVENT_TYPE\",\"client_payload\":{
+                  \"submodule\":\"${GITHUB_REPOSITORY}\",
+                  \"ref\":\"${GITHUB_REF}\",
+                  \"sha\":\"${GITHUB_SHA}\"
+                }}"
