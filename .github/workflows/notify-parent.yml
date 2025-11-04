@@ -17,12 +17,16 @@ jobs:
           EVENT_TYPE: submodule-yaml-changed
           # 需要一个有 repo 权限的 PAT，放在子模块的 Secrets
           PAT: ${{ secrets.PARENT_REPO_TOKEN }}
+          SERVICE: authservice                     # ← 手动写或脚本从 repo 名推导
+          PATH_IN_PARENT: acmeair-authservice-java # ← 子模块在父仓库中的目录名
         run: |
           curl -s -X POST "https://api.github.com/repos/$PARENT_REPO/dispatches" \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: token $PAT" \
             -d "{\"event_type\":\"$EVENT_TYPE\",\"client_payload\":{
                   \"submodule\":\"${GITHUB_REPOSITORY}\",
+                  \"service\":\"${SERVICE}\",
+                  \"path\":\"${PATH_IN_PARENT}\",
                   \"ref\":\"${GITHUB_REF}\",
                   \"sha\":\"${GITHUB_SHA}\"
                 }}"
