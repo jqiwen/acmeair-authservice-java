@@ -293,7 +293,7 @@ ibm-open-liberty:
     constraints:
       enabled: false
     requests:
-      cpu: 400m
+      cpu: 500m
       memory: 512Mi
     limits:
       cpu: 500m
